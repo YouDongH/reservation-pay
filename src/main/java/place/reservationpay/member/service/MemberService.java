@@ -40,6 +40,17 @@ public class MemberService {
         return member.getId();
     }
 
+    // 아이디 중복 확인
+    public String checkLoginId(String loginId) throws Exception {
+        boolean result = memberRepository.existId(loginId);
+        if(!result){
+            return loginId;
+        }
+        else{
+            throw new Exception("이미 등록된 아이디입니다.");
+        }
+    }
+
     // 회원탈퇴
     public void removeMember(Long id) throws Exception {
         memberRepository.deleteById(id);

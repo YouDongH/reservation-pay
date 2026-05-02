@@ -112,6 +112,33 @@ class MemberServiceTest {
     }
 
     @Nested
+    @DisplayName("아이디 중복확인")
+    class existId{
+        @Test
+        @DisplayName("아이디가 존재하지 않을 경우 LoginId 반환")
+        public void test() throws Exception {
+            // given
+            String loginId = "test01";
+            given(memberRepository.existId(loginId)).willReturn(false);
+            // when
+            String result = sut.checkLoginId(loginId);
+            // then
+            assertThat(result).isEqualTo("test01");
+        }
+        @Test
+        @DisplayName("아이디가 존재할 경우 Exception Throw")
+        public void test1() throws Exception {
+            // given
+            String loginId = "test01";
+            given(memberRepository.existId(loginId)).willReturn(true);
+            // when && then
+            assertThatThrownBy(() -> sut.checkLoginId(loginId))
+                    .isInstanceOf(Exception.class)
+                    .hasMessage("이미 등록된 아이디입니다.");
+        }
+    }
+
+    @Nested
     @DisplayName("회원 탈퇴")
     class removeMember{
         @Test
