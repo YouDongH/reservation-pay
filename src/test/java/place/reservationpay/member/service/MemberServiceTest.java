@@ -11,9 +11,13 @@ import place.reservationpay.fixtures.MemberFixtures;
 import place.reservationpay.member.domain.Member;
 import place.reservationpay.member.dto.MemberDto;
 import place.reservationpay.member.dto.request.AddMemberRequest;
+import place.reservationpay.member.dto.request.EditMemberRequest;
 import place.reservationpay.member.repository.MemberRepository;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -36,10 +40,74 @@ class MemberServiceTest {
             given(memberRepository.save(any(Member.class))).willReturn(member);
             // when
             MemberDto result = sut.addMember(request);
-            System.out.println("result = " + result);
             // then
             assertThat(result).isNotNull();
             assertThat(result.loginId()).isEqualTo(request.loginId());
+        }
+    }
+
+    @Nested
+    @DisplayName("직원 정보수정")
+    class EditMember {
+        @Test
+        @DisplayName("직원정보 수정 성공시 MemberDto반환")
+        public void givenRequestWhenEditMemberThenReturnMemberDto() throws Exception {
+            // given
+            Long id = 1L;
+            EditMemberRequest request = MemberFixtures.createEditMemberRequest();
+            Member member = MemberFixtures.createMember();
+            given(memberRepository.findById(id)).willReturn(Optional.of(member));
+            // when
+            MemberDto result = sut.editMember(id,request);
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.email()).isEqualTo(request.email());
+            assertThat(result.mobile()).isEqualTo(request.mobile());
+        }
+
+        @Test
+        @DisplayName("수정할 회원 정보가 존재하지 않을경우 Exception throw")
+        public void givenNotMemberWhenEditMemberThenThrowException() throws Exception {
+            // given
+            Long id = 1L;
+            EditMemberRequest request = MemberFixtures.createEditMemberRequest();
+            given(memberRepository.findById(id)).willReturn(Optional.empty());
+            // when && then
+            assertThatThrownBy(() -> sut.editMember(id,request))
+                    .isInstanceOf(Exception.class)
+                    .hasMessage("조회 결과 존재하지 않습니다.");
+        }
+    }
+
+    @Nested
+    @DisplayName("직원 등급 수정")
+    class changeGrade {
+        @Test
+        @DisplayName("직원등급 변경 성공시 직원ID 반환")
+        public void givenSuccessWhenChangeGradeThenReturnMemberId() throws Exception {
+            // given
+            Long id = 1L;
+            String grade = "우수회원";
+            Member member = MemberFixtures.createMember();
+            given(memberRepository.findById(id)).willReturn(Optional.of(member));
+            // when
+            Long result = sut.changeGrade(id,grade);
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result).isEqualTo(id);
+        }
+
+        @Test
+        @DisplayName("수정할 회원 정보가 존재하지 않을경우 Exception throw")
+        public void givenNotMemberWhenChangeGradeThenThrowException() throws Exception {
+            // given
+            Long id = 1L;
+            String grade = "우수회원";
+            given(memberRepository.findById(id)).willReturn(Optional.empty());
+            // when && then
+            assertThatThrownBy(()->sut.changeGrade(id,grade))
+                    .isInstanceOf(Exception.class)
+                    .hasMessage("조회 결과 존재하지 않습니다.");
         }
     }
 

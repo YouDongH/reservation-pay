@@ -44,6 +44,18 @@ public class Member {
         this.createAt = createAt;
     }
 
+    public Member(Long id, String loginId, String pw, String birthday, Gender gender, String email, String mobile, String grade, LocalDate createAt) {
+        this.id = id;
+        this.loginId = loginId;
+        this.pw = pw;
+        this.birthday = birthday;
+        this.gender = gender;
+        this.email = email;
+        this.mobile = mobile;
+        this.grade = grade;
+        this.createAt = createAt;
+    }
+
     // 직원 생성메소드
     public static Member createMember(
             String loginId, String pw, String birthday, Gender gender, String email, String mobile
@@ -60,5 +72,13 @@ public class Member {
     // 직원 등급 수정 메소드
     public void changeGrade(String grade){
         this.grade = grade;
+    }
+    // 직원 생성메소드
+    public static Member createMemberForTest(
+            Long id, String loginId, String pw, String birthday, Gender gender, String email, String mobile
+    ){
+        return new Member(
+                id, loginId,pw,birthday,gender,email,mobile,"일반회원",LocalDate.now()
+        );
     }
 }
