@@ -1,9 +1,9 @@
 package place.reservationpay.member.dto.request;
 
-import place.reservationpay.member.constant.Gender;
+import jakarta.validation.constraints.NotEmpty;
 
 public record EditMemberRequest(
-        String email,
-        String mobile
+        @NotEmpty String email,
+        @NotEmpty String mobile
 ) {
 }

@@ -14,12 +14,14 @@ import place.reservationpay.fixtures.MemberFixtures;
 import place.reservationpay.member.constant.Gender;
 import place.reservationpay.member.dto.MemberDto;
 import place.reservationpay.member.dto.request.AddMemberRequest;
+import place.reservationpay.member.dto.request.EditMemberRequest;
 import place.reservationpay.member.service.MemberService;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -82,5 +84,77 @@ class MemberApiControllerTest {
                     );
         }
 
+    }
+    @Nested
+    @DisplayName("[PATCH][회원정보 수정]")
+    class EditMember {
+        @Test
+        @DisplayName("회원정보 수정시 200 OK")
+        public void givenSuccessWhenEditMemberThenResponse200OK() throws Exception {
+            // given
+            Long id = 1L;
+            EditMemberRequest request = MemberFixtures.createEditMemberRequest();
+            MemberDto dto = MemberFixtures.createMemberDto();
+            given(memberService.editMember(any(),any())).willReturn(dto);
+            String body = objectMapper.writeValueAsString(request);
+            // when
+            mockMvc.perform(
+                    patch("/api/member/{id}",id)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(body)
+            )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isOk()
+                    );
+            // then
+            verify(memberService).editMember(id,request);
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {
+                "email is null,nl,010-1111-2222",
+                "mobile is null,test01@naver.com,nl",
+        },nullValues = "nl")
+        @DisplayName("회원정보 수정값 누락시 400 BadRequest")
+        public void givenOmittedDataWhenEditMemberThenResponse400BadRequest(String name, String email, String mobile) throws Exception {
+            // given
+            Long id = 1L;
+            EditMemberRequest request = MemberFixtures.createEditMemberRequest(email,mobile);
+            given(memberService.editMember(any(),any())).willThrow(IllegalArgumentException.class);
+            String body = objectMapper.writeValueAsString(request);
+            // when
+            mockMvc.perform(
+                            patch("/api/member/{id}",id)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(body)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest()
+                    );
+            // then
+        }
+        @Test
+        @DisplayName("수정할 직원정보가 존재하지 않을시 400 BadRequest")
+        public void givenNotMemberWhenEditMemberThenResponse400BadRequest() throws Exception {
+            // given
+            Long id = 1L;
+            EditMemberRequest request = MemberFixtures.createEditMemberRequest();
+            given(memberService.editMember(any(),any())).willThrow(IllegalArgumentException.class);
+            String body = objectMapper.writeValueAsString(request);
+            // when
+            mockMvc.perform(
+                            patch("/api/member/{id}",id)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(body)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest()
+                    );
+            // then
+            verify(memberService).editMember(id,request);
+        }
     }
 }

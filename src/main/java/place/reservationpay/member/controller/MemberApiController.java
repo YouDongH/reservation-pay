@@ -18,20 +18,19 @@ public class MemberApiController {
 
     // 회원등록
     @PostMapping("/member")
-    public ApiResponse addMember(@RequestBody @Valid AddMemberRequest request) {
+    public ApiResponse<MemberDto> addMember(@RequestBody @Valid AddMemberRequest request) {
         MemberDto result = memberService.addMember(request);
-        ApiResponse<MemberDto> response = ApiResponse.success(result, "회원가입에 성공하였습니다.");
-        System.out.println("response = " + response);
-        return response;
+        return ApiResponse.success(result, "회원가입에 성공하였습니다.");
     }
     // 회원정보수정
     @PatchMapping("/member/{id}")
-    public MemberDto editMember(@PathVariable Long id,@Valid EditMemberRequest request) {
-        return null;
+    public ApiResponse<MemberDto> editMember(@PathVariable Long id,@RequestBody @Valid EditMemberRequest request) throws Exception {
+        MemberDto result = memberService.editMember(id, request);
+        return ApiResponse.success(result, "회원정보 수정에 성공하였습니다.");
     }
     // 회원등급변경
     @PatchMapping("/member/{id}/change-grade")
-    public MemberDto changeGrade(@PathVariable Long id,@NotEmpty String grade){
+    public ApiResponse<Long> changeGrade(@PathVariable Long id, @NotEmpty String grade) throws Exception {
         return null;
     }
     // 아이디 중복체크

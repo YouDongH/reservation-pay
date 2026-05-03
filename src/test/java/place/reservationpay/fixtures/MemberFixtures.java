@@ -23,10 +23,17 @@ public class MemberFixtures {
                 "email02@naver.com","010-1111-8888"
         );
     }
+    public static EditMemberRequest createEditMemberRequest(String email, String mobile) {
+        return new EditMemberRequest(email,mobile);
+    }
+
     public static Member createMember() {
         return Member.createMemberForTest(1L,"test01","1234","2002-01-25", Gender.WOMAN,"email@naver.com","010-9999-8888");
     }
     public static MemberDto createMemberDto() {
         return new MemberDto("test01","1234","2002-01-25", Gender.WOMAN,"email@naver.com","010-9999-8888");
+    }
+    public static MemberDto updateMemberDto() {
+        return new MemberDto("test01","1234","2002-01-25", Gender.WOMAN,"email02@naver.com","010-1111-8888");
     }
 }
