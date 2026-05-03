@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import place.reservationpay.member.constant.Gender;
 
 import java.time.LocalDate;
 
 @Entity
-@Getter
+@Getter @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name ="member")
 public class Member {

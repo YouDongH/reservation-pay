@@ -16,4 +16,7 @@ public record MemberDto(
                 member.getLoginId(), member.getPw(), member.getBirthday(), member.getGender(), member.getEmail(), member.getMobile()
         );
     }
+    public static MemberDto of(String loginId, String pw, String birthday, Gender gender, String email, String mobile) {
+        return new MemberDto(loginId, pw, birthday, gender, email, mobile);
+    }
 }
