@@ -29,4 +29,11 @@ public class ApiExceptionHandler {
         ApiResponse.error(ErrorCode.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
+    //
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse> handleException(IllegalStateException e) {
+        ApiResponse.error(ErrorCode.CONFLICT);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+    }
 }

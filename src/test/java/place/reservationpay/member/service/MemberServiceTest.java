@@ -66,15 +66,15 @@ class MemberServiceTest {
         }
 
         @Test
-        @DisplayName("수정할 회원 정보가 존재하지 않을경우 Exception throw")
-        public void givenNotMemberWhenEditMemberThenThrowException() throws Exception {
+        @DisplayName("수정할 회원 정보가 존재하지 않을경우 IllegalArgumentException throw")
+        public void givenNotMemberWhenEditMemberThenThrowIllegalArgumentException() throws Exception {
             // given
             Long id = 1L;
             EditMemberRequest request = MemberFixtures.createEditMemberRequest();
             given(memberRepository.findById(id)).willReturn(Optional.empty());
             // when && then
             assertThatThrownBy(() -> sut.editMember(id,request))
-                    .isInstanceOf(Exception.class)
+                    .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("조회 결과 존재하지 않습니다.");
         }
     }
@@ -98,8 +98,8 @@ class MemberServiceTest {
         }
 
         @Test
-        @DisplayName("수정할 회원 정보가 존재하지 않을경우 Exception throw")
-        public void givenNotMemberWhenChangeGradeThenThrowException() throws Exception {
+        @DisplayName("수정할 회원 정보가 존재하지 않을경우 IllegalArgumentException throw")
+        public void givenNotMemberWhenChangeGradeThenThrowIllegalArgumentException() throws Exception {
             // given
             Long id = 1L;
             String grade = "우수회원";
@@ -116,7 +116,7 @@ class MemberServiceTest {
     class existId{
         @Test
         @DisplayName("아이디가 존재하지 않을 경우 LoginId 반환")
-        public void test() throws Exception {
+        public void givenNotExistIdWhenCheckLoginIdThenReturnLoginId() throws Exception {
             // given
             String loginId = "test01";
             given(memberRepository.existId(loginId)).willReturn(false);
@@ -126,14 +126,14 @@ class MemberServiceTest {
             assertThat(result).isEqualTo("test01");
         }
         @Test
-        @DisplayName("아이디가 존재할 경우 Exception Throw")
-        public void test1() throws Exception {
+        @DisplayName("아이디가 존재할 경우 IllegalStateException Throw")
+        public void givenExistIdWhenCheckLoginIdThenThrowIllegalStateException() throws Exception {
             // given
             String loginId = "test01";
             given(memberRepository.existId(loginId)).willReturn(true);
             // when && then
             assertThatThrownBy(() -> sut.checkLoginId(loginId))
-                    .isInstanceOf(Exception.class)
+                    .isInstanceOf(IllegalStateException.class)
                     .hasMessage("이미 등록된 아이디입니다.");
         }
     }

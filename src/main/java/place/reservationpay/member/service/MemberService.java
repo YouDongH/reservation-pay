@@ -25,7 +25,7 @@ public class MemberService {
     // 직원정보 수정
     public MemberDto editMember(Long id, EditMemberRequest request) throws Exception {
         Member member = memberRepository.findById(id)
-                .orElseThrow(()-> new Exception("조회 결과 존재하지 않습니다."));
+                .orElseThrow(()-> new IllegalArgumentException("조회 결과 존재하지 않습니다."));
         member.updateMember(request.email(), request.mobile());
 
         return MemberDto.from(member);
@@ -34,7 +34,7 @@ public class MemberService {
     // 직원 등급 변경
     public Long changeGrade(Long id, String grade) throws Exception {
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new Exception("조회 결과 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("조회 결과 존재하지 않습니다."));
         member.changeGrade(grade);
 
         return member.getId();
@@ -47,7 +47,7 @@ public class MemberService {
             return loginId;
         }
         else{
-            throw new Exception("이미 등록된 아이디입니다.");
+            throw new IllegalStateException("이미 등록된 아이디입니다.");
         }
     }
 
