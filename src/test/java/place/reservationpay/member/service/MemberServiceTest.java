@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import place.reservationpay.fixtures.MemberFixtures;
 import place.reservationpay.member.domain.Member;
 import place.reservationpay.member.dto.MemberDto;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.verify;
 class MemberServiceTest {
     @InjectMocks private MemberService sut;
     @Mock private MemberRepository memberRepository;
+    @Mock private PasswordEncoder passwordEncoder;
 
     @Nested
     @DisplayName("직원등록")
@@ -37,12 +39,29 @@ class MemberServiceTest {
             // given
             AddMemberRequest request = MemberFixtures.createAddMemberRequest();
             Member member = MemberFixtures.createMember();
+            String encodedPassword = passwordEncoder.encode("1234");
             given(memberRepository.save(any(Member.class))).willReturn(member);
+            given(passwordEncoder.encode(any())).willReturn(encodedPassword);
             // when
             MemberDto result = sut.addMember(request);
             // then
             assertThat(result).isNotNull();
             assertThat(result.loginId()).isEqualTo(request.loginId());
+        }
+        @Test
+        @DisplayName("직원 등록시 비번 암호화")
+        public void givenPasswordWhenAddMemberThenEncodePassword() throws Exception {
+            // given
+            AddMemberRequest request = MemberFixtures.createAddMemberRequest();
+            String pw="1234";
+            String encodedPassword = passwordEncoder.encode(pw);
+            Member member = MemberFixtures.createMember(encodedPassword);
+            given(memberRepository.save(any(Member.class))).willReturn(member);
+            given(passwordEncoder.encode(any())).willReturn(encodedPassword);
+            // when
+            MemberDto result = sut.addMember(request);
+            // then
+            assertThat(result.pw()).isEqualTo(encodedPassword);
         }
     }
 

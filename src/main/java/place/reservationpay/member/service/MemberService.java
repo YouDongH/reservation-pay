@@ -1,6 +1,7 @@
 package place.reservationpay.member.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import place.reservationpay.member.domain.Member;
@@ -14,15 +15,20 @@ import place.reservationpay.member.repository.MemberRepository;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+
     // 직원등록
+    @Transactional
     public MemberDto addMember(AddMemberRequest request) {
-        Member member = Member.createMember(request.loginId(), request.pw(), request.birthday(), request.gender(), request.email(), request.mobile());
+        String pw = passwordEncoder.encode(request.pw());
+        Member member = Member.createMember(request.loginId(), pw, request.birthday(), request.gender(), request.email(), request.mobile());
         Member result = memberRepository.save(member);
         System.out.println("result = " + result);
         return MemberDto.from(result);
     }
 
     // 직원정보 수정
+    @Transactional
     public MemberDto editMember(Long id, EditMemberRequest request) throws Exception {
         Member member = memberRepository.findById(id)
                 .orElseThrow(()-> new IllegalArgumentException("조회 결과 존재하지 않습니다."));
@@ -32,6 +38,7 @@ public class MemberService {
     }
 
     // 직원 등급 변경
+    @Transactional
     public Long changeGrade(Long id, String grade) throws Exception {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("조회 결과 존재하지 않습니다."));
@@ -52,6 +59,7 @@ public class MemberService {
     }
 
     // 회원탈퇴
+    @Transactional
     public void removeMember(Long id) throws Exception {
         memberRepository.deleteById(id);
     }
