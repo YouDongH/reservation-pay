@@ -218,4 +218,64 @@ class MemberApiControllerTest {
         }
     }
 
+    @Nested
+    @DisplayName("[아이디 중복체크][GET] /api/member/check-id")
+    class CheckId {
+        @Test
+        @DisplayName("중복된 아이디가 존재하지 않을 경우 200 OK")
+        public void givenNotExistLoginIdWhenCheckLoginIdThenResponse200OK() throws Exception {
+            // given
+            String loginId = "test01";
+            given(memberService.checkLoginId(any())).willReturn(loginId);
+            // when
+            mockMvc.perform(
+                    get("/api/member/check-id")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("loginId",loginId)
+            )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isOk()
+                    );
+            // then
+            verify(memberService).checkLoginId(loginId);
+        }
+
+        @Test
+        @DisplayName("중복된 아이디가 존재할 경우 400 BadRequest")
+        public void givenNotInputLoginIdWhenCheckLoginIdThenResponse400BadRequest() throws Exception {
+            // given
+            Long id = 1L;
+            // when
+            mockMvc.perform(
+                            get("/api/member/check-id")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest()
+                    );
+            // then
+        }
+
+        @Test
+        @DisplayName("중복된 아이디가 존재할 경우 409 CONFLICT")
+        public void givenNotExistLoginIdWhenCheckLoginIdThenResponse409Conflict() throws Exception {
+            // given
+            String loginId = "test01";
+            given(memberService.checkLoginId(any())).willThrow(IllegalStateException.class);
+            // when
+            mockMvc.perform(
+                            get("/api/member/check-id")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .param("loginId",loginId)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isConflict()
+                    );
+            // then
+            verify(memberService).checkLoginId(loginId);
+        }
+    }
 }

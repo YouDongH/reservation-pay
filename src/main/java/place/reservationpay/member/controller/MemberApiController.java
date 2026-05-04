@@ -37,7 +37,8 @@ public class MemberApiController {
     // 아이디 중복체크
     @GetMapping("/member/check-id")
     public ApiResponse<String> checkLoginId(@NotEmpty String loginId) throws Exception {
-        return null;
+        String response = memberService.checkLoginId(loginId);
+        return ApiResponse.success(response,"사용가능한 아이디입니다.");
     }
     // 회원탈퇴
     @DeleteMapping("/member/{id}")
