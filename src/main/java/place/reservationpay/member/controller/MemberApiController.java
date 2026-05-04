@@ -43,7 +43,8 @@ public class MemberApiController {
     // 회원탈퇴
     @DeleteMapping("/member/{id}")
     public ApiResponse<Object> removeMember(@PathVariable Long id) throws Exception {
-        return null;
+        memberService.removeMember(id);
+        return ApiResponse.success(null,"회원탈퇴에 성공하였습니다.");
     }
 
 }

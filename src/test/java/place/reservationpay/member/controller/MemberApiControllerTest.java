@@ -277,5 +277,27 @@ class MemberApiControllerTest {
             // then
             verify(memberService).checkLoginId(loginId);
         }
+        @Nested
+        @DisplayName("[회원탈퇴][DELETE] /api/member")
+        class RemoveMember {
+            @Test
+            @DisplayName("회원탈퇴 성공시 200 OK")
+            public void givenSuccessWhenRemoveMemberThenResponse200OK() throws Exception {
+                // given
+                Long id = 1L;
+                // when
+                mockMvc.perform(
+                        delete("/api/member/{id}",id)
+                            .contentType(MediaType.APPLICATION_JSON)
+
+                )
+                        .andDo(print())
+                        .andExpectAll(
+                                status().isOk()
+                        );
+                // then
+                verify(memberService).removeMember(id);
+            }
+        }
     }
 }
