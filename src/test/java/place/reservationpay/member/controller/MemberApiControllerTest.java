@@ -21,8 +21,7 @@ import tools.jackson.databind.ObjectMapper;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -157,4 +156,66 @@ class MemberApiControllerTest {
             verify(memberService).editMember(id,request);
         }
     }
+    @Nested
+    @DisplayName("[회원등급 변경][PATCH] /api/member/{id}/change-grade")
+    class ChangeGrade {
+        @Test
+        @DisplayName("회원등급 변경 성공시 200OK 응답")
+        public void givenSuccessWhenChangeGradeThenResponse200OK() throws Exception {
+            // given
+            Long id = 1L;
+            String grade = "우수회원";
+            given(memberService.changeGrade(any(),any())).willReturn(id);
+            // when
+            mockMvc.perform(
+                    patch("/api/member/{id}/change-grade",id)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("grade",grade)
+            )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isOk()
+                    );
+            // then
+            verify(memberService).changeGrade(id,grade);
+        }
+
+        @Test
+        @DisplayName("수정할 회원등급 값 누락시 400 BadRequest")
+        public void givenOmittedGradeWhenChangeGradeThenResponse400BadRequest() throws Exception {
+            // given
+            Long id = 1L;
+            // when && then
+            mockMvc.perform(
+                            patch("/api/member/{id}/change-grade",id)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest()
+                    );
+        }
+
+        @Test
+        @DisplayName("수정할 직원정보가 존재하지 않을시 400 BadRequest")
+        public void givenNotMemberWhenChangeGradeThenResponse400BadRequest() throws Exception {
+            // given
+            Long id = 1L;
+            String grade = "우수회원";
+            given(memberService.changeGrade(any(),any())).willThrow(IllegalArgumentException.class);
+            // when
+            mockMvc.perform(
+                            patch("/api/member/{id}/change-grade",id)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .param("grade",grade)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest()
+                    );
+            // then
+            verify(memberService).changeGrade(id,grade);
+        }
+    }
+
 }

@@ -31,17 +31,18 @@ public class MemberApiController {
     // 회원등급변경
     @PatchMapping("/member/{id}/change-grade")
     public ApiResponse<Long> changeGrade(@PathVariable Long id, @NotEmpty String grade) throws Exception {
-        return null;
+        Long response = memberService.changeGrade(id, grade);
+        return ApiResponse.success(response, "회원등급 수정에 성공하였습니다.");
     }
     // 아이디 중복체크
     @GetMapping("/member/check-id")
-    public String existId(@NotEmpty String loginId){
+    public ApiResponse<String> checkLoginId(@NotEmpty String loginId) throws Exception {
         return null;
     }
     // 회원탈퇴
-    @DeleteMapping("/member")
-    public void removeMember(Long id){
-
+    @DeleteMapping("/member/{id}")
+    public ApiResponse<Object> removeMember(@PathVariable Long id) throws Exception {
+        return null;
     }
 
 }
