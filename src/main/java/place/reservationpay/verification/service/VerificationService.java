@@ -5,7 +5,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import place.reservationpay.verification.constant.AuthFlag;
 import place.reservationpay.verification.domain.Verification;
+import place.reservationpay.verification.dto.CheckVerificationRequest;
 import place.reservationpay.verification.dto.SendVerificationRequest;
 import place.reservationpay.verification.repository.VerificationRepository;
 
@@ -32,6 +34,15 @@ public class VerificationService {
         Verification result = verificationRepository.save(verification);
 
         sendMail(request.email(), code);
+    }
+    // 이메일 인증 조회
+    public AuthFlag checkVerification(CheckVerificationRequest request){
+        Verification result = verificationRepository.findTopByVerEmailOrderByExpiredTimeDesc(request.email())
+                .orElseThrow(() -> new IllegalStateException("요청한 인증이 없습니다."));
+        boolean flag = result.getVerCode().equals(request.code());
+
+        result.changeAuthFlag(flag);
+        return result.getAuthFlag();
     }
 
     // 이메일 전송
