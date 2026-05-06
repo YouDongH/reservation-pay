@@ -21,4 +21,10 @@ public class VerificationController {
         verificationService.sendVerificationCode(request);
         return ApiResponse.success(null,"인증메일이 발송되었씁니다.");
     }
+    // 인증확인
+    @PatchMapping("/code/check")
+    public ApiResponse<AuthFlag> checkVerificationCode(@Valid @RequestBody CheckVerificationRequest request) {
+        AuthFlag authFlag = verificationService.checkVerification(request);
+        return ApiResponse.success(authFlag,"인증되었습니다.");
+    }
 }

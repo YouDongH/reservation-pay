@@ -73,4 +73,112 @@ class VerificationControllerTest {
                     );
         }
     }
+    @Nested
+    @DisplayName("[인증번호 검증][PATCH] /api/code/check")
+    class CheckCode {
+        @Test
+        @DisplayName("인증메일 검증 성공시 200 OK")
+        public void givenSuccessWhenCheckCodeThenResponse200OK() throws Exception {
+            // given
+            CheckVerificationRequest request = new CheckVerificationRequest("test01@naver.com","967586");
+            given(verificationService.checkVerification(any())).willReturn(AuthFlag.SUCCESS);
+            String body = objectMapper.writeValueAsString(request);
+            // when
+            mockMvc.perform(
+                    patch("/api/code/check")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+            )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isOk()
+                    );
+            // then
+            verify(verificationService).checkVerification(request);
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {"email is null,nl,554125","verType is null,test01@naver.com,nl"},nullValues = "nl")
+        @DisplayName("입력값이 입력되지않았을경우 400 BadRequest")
+        public void givenNotInputParameterWhenCheckCodeThenResponse400BadRequest(String name, String email, String code) throws Exception {
+            // given
+            SendVerificationRequest request = new SendVerificationRequest(email,code);
+            String body = objectMapper.writeValueAsString(request);
+            // when && then
+            mockMvc.perform(
+                            patch("/api/code/check")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(body)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest()
+                    );
+        }
+        @Test
+        @DisplayName("이메일 인증 요청이 없는 경우 409 Conflict")
+        public void givenNotSendCodeWhenCheckCodeThenResponse409Conflict() throws Exception {
+            // given
+            CheckVerificationRequest request = new CheckVerificationRequest("test01@naver.com","967586");
+            given(verificationService.checkVerification(any()))
+                    .willThrow(new IllegalStateException("요청한 인증이 없습니다."));
+            String body = objectMapper.writeValueAsString(request);
+            // when
+            mockMvc.perform(
+                            patch("/api/code/check")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(body)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isConflict(),
+                            jsonPath("$.message").value("요청한 인증이 없습니다.")
+                    );
+            // then
+            verify(verificationService).checkVerification(request);
+        }
+        @Test
+        @DisplayName("이미 인증한 경우이 409 Conflict")
+        public void givenExistVerificationOkWhenCheckCodeThenResponse409Conflict() throws Exception {
+            CheckVerificationRequest request = new CheckVerificationRequest("test01@naver.com","967586");
+            given(verificationService.checkVerification(any()))
+                    .willThrow(new IllegalStateException("이미 인증하였습니다."));
+            String body = objectMapper.writeValueAsString(request);
+            // when
+            mockMvc.perform(
+                            patch("/api/code/check")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(body)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isConflict(),
+                            jsonPath("$.message").value("이미 인증하였습니다.")
+                    );
+            // then
+            verify(verificationService).checkVerification(request);
+        }
+        @Test
+        @DisplayName("인증시간이 경과한 경우 409 Conflict")
+        public void givenExpiredTimeWhenCheckCodeThenResponse409Conflict() throws Exception {
+            CheckVerificationRequest request = new CheckVerificationRequest("test01@naver.com","967586");
+            given(verificationService.checkVerification(any()))
+                    .willThrow(new IllegalStateException("인증시간이 경과하였습니다."));
+            String body = objectMapper.writeValueAsString(request);
+            // when
+            mockMvc.perform(
+                            patch("/api/code/check")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(body)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isConflict(),
+                            jsonPath("$.message").value("인증시간이 경과하였습니다.")
+                    );
+            // then
+            verify(verificationService).checkVerification(request);
+        }
+
+    }
 }
