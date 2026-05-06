@@ -22,4 +22,9 @@ public enum ErrorCode {
         this.code = code;
         this.message = message;
     }
+
+    public String getMessage(Throwable e) {
+        return e.getMessage();
+    }
+
 }

@@ -26,14 +26,16 @@ public class ApiExceptionHandler {
     // IllegalArgumentException - 입력값 오류처리
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse> handleException(IllegalArgumentException e) {
-        ApiResponse.error(ErrorCode.BAD_REQUEST);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        ErrorCode errorCode = ErrorCode.BAD_REQUEST;
+        ApiResponse body = ApiResponse.error(errorCode.getCode(), e.getMessage());
+        return ResponseEntity.status(errorCode.getStatus()).body(body);
     }
     //
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiResponse> handleException(IllegalStateException e) {
-        ApiResponse.error(ErrorCode.CONFLICT);
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        ErrorCode errorCode = ErrorCode.CONFLICT;
+        ApiResponse body = ApiResponse.error(errorCode.getCode(), e.getMessage());
+        return ResponseEntity.status(errorCode.getStatus()).body(body);
 
     }
 }

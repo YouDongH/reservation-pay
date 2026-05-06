@@ -44,8 +44,8 @@ public class ApiResponse<T> {
     }
 
     // 에러처리
-    public static ApiResponse error(ErrorCode errorCode) {
-        return new ApiResponse(errorCode.getCode(), errorCode.getMessage());
+    public static ApiResponse error(String code,String message) {
+        return new ApiResponse(code, message);
     }
     public static <T>ApiResponse<T> success(T data, String message) {
         return new ApiResponse<>(data,message);
