@@ -7,6 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import place.reservationpay.fixtures.RoomFixtures;
 import place.reservationpay.place.constant.RoomStatus;
 import place.reservationpay.place.domain.Room;
@@ -15,6 +19,7 @@ import place.reservationpay.place.dto.EditRoomRequest;
 import place.reservationpay.place.dto.RoomDto;
 import place.reservationpay.place.repository.RoomRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +32,25 @@ import static org.mockito.Mockito.verify;
 class RoomServiceTest {
     @InjectMocks private RoomService sut;
     @Mock private RoomRepository roomRepository;
+
+    @Nested
+    @DisplayName("룸 목록 조회")
+    class GetRooms{
+        @Test
+        @DisplayName("조회 성공시 Room 반환")
+        public void givenSuccessWhenGetRoomThenReturnRoom() throws Exception {
+            // given
+            Long id = 1L;
+            Room room = RoomFixtures.createRoom();
+            PageImpl<Room> rooms = new PageImpl<>(List.of(room));
+            given(roomRepository.findByStatus(any())).willReturn(rooms);
+            // when
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<RoomDto> result = sut.getRooms(pageable);
+            // then
+            assertThat(result.getSize()).isEqualTo(1);
+        }
+    }
 
     @Nested
     @DisplayName("룸 상세정보 조회")

@@ -1,6 +1,8 @@
 package place.reservationpay.place.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import place.reservationpay.place.constant.RoomStatus;
@@ -16,6 +18,11 @@ import place.reservationpay.place.repository.RoomRepository;
 public class RoomService {
     private final RoomRepository roomRepository;
 
+    // 룸 목록 조회
+    public Page<RoomDto> getRooms(Pageable pageable) {
+        Page<Room> results = roomRepository.findByStatus(pageable);
+        return results.map(RoomDto::from);
+    }
     // 룸 상세조회
     public RoomDto getRoom(Long id) {
         Room room = roomRepository.findById(id)
