@@ -16,6 +16,12 @@ import place.reservationpay.place.repository.RoomRepository;
 public class RoomService {
     private final RoomRepository roomRepository;
 
+    // 룸 상세조회
+    public RoomDto getRoom(Long id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("룸 정보가 존재하지 않습니다."));
+        return RoomDto.from(room);
+    }
     // 룸 등록
     public RoomDto addRoom(AddRoomRequest request) {
         Room room = Room.createRoom(request.roomName(), request.capacity(), request.pricePerHour(), request.startTime(), request.endTime(), request.description());

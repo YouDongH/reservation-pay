@@ -28,6 +28,36 @@ class RoomServiceTest {
     @InjectMocks private RoomService sut;
     @Mock private RoomRepository roomRepository;
 
+    @Nested
+    @DisplayName("룸 상세정보 조회")
+    class GetRoom{
+        @Test
+        @DisplayName("조회 성공시 Room 반환")
+        public void givenSuccessWhenGetRoomThenReturnRoom() throws Exception {
+            // given
+            Long id = 1L;
+            Room room = RoomFixtures.createRoom();
+            given(roomRepository.findById(any())).willReturn(Optional.of(room));
+            // when
+            RoomDto result = sut.getRoom(id);
+            // then
+            assertThat(result.roomName()).isEqualTo(room.getRoomName());
+            assertThat(result.capacity()).isEqualTo(room.getCapacity());
+            assertThat(result.startTime()).isEqualTo(room.getStartTime());
+        }
+
+        @Test
+        @DisplayName("수정할 룸 정보가 존재하지 않을시 IllegalArgumentException Throw")
+        public void givenNotExistRoomWhenEditRoomThenReturnIllegalArgumentExceptionThrow() throws Exception {
+            // given
+            Long id = 1L;
+            given(roomRepository.findById(any())).willReturn(Optional.empty());
+            // when && then
+            assertThatThrownBy(()->sut.getRoom(id))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("룸 정보가 존재하지 않습니다.");
+        }
+    }
 
     @Nested
     @DisplayName("룸 등록")
