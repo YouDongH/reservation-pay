@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import place.reservationpay.fixtures.RoomFixtures;
+import place.reservationpay.place.constant.RoomStatus;
 import place.reservationpay.place.domain.Room;
 import place.reservationpay.place.dto.AddRoomRequest;
 import place.reservationpay.place.dto.EditRoomRequest;
@@ -20,11 +21,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class RoomServiceTest {
     @InjectMocks private RoomService sut;
     @Mock private RoomRepository roomRepository;
+
 
     @Nested
     @DisplayName("룸 등록")
@@ -76,6 +79,47 @@ class RoomServiceTest {
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("등록된 룸 정보가 존재하지 않습니다.");
         }
+    }
+    @Nested
+    @DisplayName("룸 상태변경")
+    class ChangeRoomStatus {
+        @Test
+        @DisplayName("상태변경 성공시 RoomId 반환")
+        public void givenSuccessWhenChangeRoomStatusThenReturnRoomId() throws Exception {
+            // given
+            Long id = 1L;
+            RoomStatus roomStatus = RoomStatus.ACTIVE;
+            Room room = RoomFixtures.createRoom();
+            given(roomRepository.findById(any())).willReturn(Optional.of(room));
+            // when
+            Long result = sut.changeStatus(id, roomStatus);
+            // then
+            assertThat(result).isEqualTo(id);
+        }
+
+        @Test
+        @DisplayName("수정할 룸 정보가 존재하지 않을시 IllegalArgumentException Throw")
+        public void givenNotExistRoomWhenChangeRoomStatusThenReturnIllegalArgumentExceptionThrow() throws Exception {
+            // given
+            Long id = 1L;
+            RoomStatus roomStatus = RoomStatus.ACTIVE;
+            given(roomRepository.findById(any())).willReturn(Optional.empty());
+            // when && then
+            assertThatThrownBy(()->sut.changeStatus(id,roomStatus))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("등록된 룸 정보가 존재하지 않습니다.");
+        }
+    }
+
+    @Test
+    @DisplayName("룸 삭제 테스트")
+    public void removeRoomTest() throws Exception {
+        // given
+        Long id = 1L;
+        // when
+        sut.removeRoom(id);
+        // then
+        verify(roomRepository).deleteById(id);
     }
 
 }

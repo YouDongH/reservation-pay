@@ -3,6 +3,7 @@ package place.reservationpay.place.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import place.reservationpay.place.constant.RoomStatus;
 import place.reservationpay.place.domain.Room;
 import place.reservationpay.place.dto.AddRoomRequest;
 import place.reservationpay.place.dto.EditRoomRequest;
@@ -29,6 +30,17 @@ public class RoomService {
                 request.roomName(),request.capacity(),request.pricePerHour(),request.startTime(),request.endTime(),request.description()
         );
         return RoomDto.from(room);
+    }
+    // 룸 상태 수정
+    public Long changeStatus(Long id, RoomStatus status){
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("등록된 룸 정보가 존재하지 않습니다."));
+        room.changeStatus(status);
+        return id;
+    }
+    // 룸 삭제
+    public void removeRoom(Long id) {
+        this.roomRepository.deleteById(id);
     }
     
 }
