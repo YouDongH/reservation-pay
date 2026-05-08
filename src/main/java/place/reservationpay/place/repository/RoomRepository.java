@@ -4,9 +4,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import place.reservationpay.place.constant.RoomStatus;
 import place.reservationpay.place.domain.Room;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
-    Page<Room> findByStatus(Pageable pageable);
+    Page<Room> findByStatus(Pageable pageable, RoomStatus status);
 }
