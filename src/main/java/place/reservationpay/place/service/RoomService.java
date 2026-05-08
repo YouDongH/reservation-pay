@@ -20,7 +20,7 @@ public class RoomService {
 
     // 룸 목록 조회
     public Page<RoomDto> getRooms(Pageable pageable) {
-        Page<Room> results = roomRepository.findByStatus(pageable);
+        Page<Room> results = roomRepository.findByStatus(pageable, RoomStatus.ACTIVE);
         return results.map(RoomDto::from);
     }
     // 룸 상세조회

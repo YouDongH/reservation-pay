@@ -43,7 +43,7 @@ class RoomServiceTest {
             Long id = 1L;
             Room room = RoomFixtures.createRoom();
             PageImpl<Room> rooms = new PageImpl<>(List.of(room));
-            given(roomRepository.findByStatus(any())).willReturn(rooms);
+            given(roomRepository.findByStatus(any(),any())).willReturn(rooms);
             // when
             Pageable pageable = PageRequest.of(0, 10);
             Page<RoomDto> result = sut.getRooms(pageable);
