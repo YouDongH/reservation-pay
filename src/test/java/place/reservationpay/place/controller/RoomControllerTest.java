@@ -12,6 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import place.reservationpay.fixtures.RoomFixtures;
 import place.reservationpay.place.dto.AddRoomRequest;
+import place.reservationpay.place.dto.EditRoomRequest;
 import place.reservationpay.place.dto.RoomDto;
 import place.reservationpay.place.service.RoomService;
 import tools.jackson.databind.ObjectMapper;
@@ -83,5 +84,79 @@ class RoomControllerTest {
                             status().isBadRequest()
                     );
         }
+    }
+
+    @Nested
+    @DisplayName("[룸정보 수정][PATCH] /api/room/{id}")
+    class EditRoom {
+        @Test
+        @DisplayName("룸 등록 성공시 200 OK")
+        public void givenSuccessWhenEditRoomThen200Ok() throws Exception {
+            // given
+            EditRoomRequest request = RoomFixtures.createEditRoomRequest();
+            RoomDto roomDto = RoomFixtures.createRoomDto();
+            given(roomService.editRoom(any(),any())).willReturn(roomDto);
+            String body = objectMapper.writeValueAsString(request);
+            // when
+            mockMvc.perform(
+                            patch("/api/room/{id}",1L)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(body)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isOk(),
+                            jsonPath("$.data.id").value(1L),
+                            jsonPath("$.data.roomName").value(roomDto.roomName())
+                    );
+            // then
+            verify(roomService).editRoom(1L,request);
+        }
+        @ParameterizedTest
+        @CsvSource(value = {
+                "nl,11:00:00,22:00:00",
+                "1번 스터디룸,nl,22:00:00",
+                "1번 스터디룸,11:00:00,nl"
+        },nullValues = "nl")
+        @DisplayName("등록정보 누락시 400 BadRequest")
+        public void givenOmittedDataWhenEditRoomThen400BADREQUEST(
+                String roomName, LocalTime startTime, LocalTime endTime
+        ) throws Exception {
+            // given
+            EditRoomRequest request = RoomFixtures.createEditRoomRequest(roomName, startTime, endTime);
+            String body = objectMapper.writeValueAsString(request);
+            // when && then
+            mockMvc.perform(
+                            patch("/api/room/{id}",1L)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(body)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest()
+                    );
+        }
+        @Test
+        @DisplayName("수정할 룸정보가 존재하지 않을시 400 BadRequest")
+        public void givenNotEditRoomWhenEditRoomThen400BadRequest() throws Exception {
+            // given
+            EditRoomRequest request = RoomFixtures.createEditRoomRequest();
+            given(roomService.editRoom(any(),any())).willThrow(new IllegalArgumentException("등록된 룸 정보가 존재하지 않습니다."));
+            String body = objectMapper.writeValueAsString(request);
+            // when
+            mockMvc.perform(
+                            patch("/api/room/{id}",1L)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(body)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest(),
+                            jsonPath("$.message").value("등록된 룸 정보가 존재하지 않습니다.")
+                    );
+            // then
+            verify(roomService).editRoom(1L,request);
+        }
+
     }
 }

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import place.reservationpay.common.dto.ApiResponse;
 import place.reservationpay.place.dto.AddRoomRequest;
+import place.reservationpay.place.dto.EditRoomRequest;
 import place.reservationpay.place.dto.RoomDto;
 import place.reservationpay.place.service.RoomService;
 
@@ -18,5 +19,10 @@ public class RoomController {
     public ApiResponse<RoomDto> addRoom(@Valid @RequestBody AddRoomRequest request) throws Exception {
         RoomDto response = roomService.addRoom(request);
         return ApiResponse.success(response,"등록에 성공하였습니다.");
+    }
+    @PatchMapping("/room/{id}")
+    public ApiResponse<RoomDto> editRoom(@Valid @PathVariable Long id, @Valid @RequestBody EditRoomRequest request) throws Exception {
+        RoomDto response = roomService.editRoom(id, request);
+        return ApiResponse.success(response,"수정에 성공하였습니다.");
     }
 }
