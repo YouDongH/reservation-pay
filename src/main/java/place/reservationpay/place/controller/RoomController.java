@@ -16,6 +16,7 @@ import place.reservationpay.place.service.RoomService;
 public class RoomController {
     private final RoomService roomService;
 
+
     @PostMapping("/room")
     public ApiResponse<RoomDto> addRoom(@Valid @RequestBody AddRoomRequest request) throws Exception {
         RoomDto response = roomService.addRoom(request);
@@ -30,5 +31,10 @@ public class RoomController {
     public ApiResponse<Long> changeStatus(@PathVariable Long id, RoomStatus roomStatus) throws Exception {
         Long response = roomService.changeStatus(id, roomStatus);
         return ApiResponse.success(response,"상태변경에 성공하였습니다.");
+    }
+    @DeleteMapping("/room/{id}")
+    public ApiResponse<Object> removeRoom(@PathVariable Long id){
+        roomService.removeRoom(id);
+        return ApiResponse.success(null,"삭제에 성공하였습니다.");
     }
 }

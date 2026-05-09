@@ -207,4 +207,25 @@ class RoomControllerTest {
             verify(roomService).changeStatus(id,roomStatus);
         }
     }
+
+
+    @Nested
+    @DisplayName("[룸 정보 삭제][DELETE] /api/room/{id}")
+    class removeRoom {
+        @Test
+        @DisplayName("룸 삭제 성공시 200 OK")
+        public void givenSuccessWhenRemoveRoomThen200Ok() throws Exception {
+            // given && when
+            mockMvc.perform(
+                            delete("/api/room/{id}",1L)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isOk(),
+                            jsonPath("$.message").value("삭제에 성공하였습니다.")
+                    );
+            // then
+            verify(roomService).removeRoom(1L);
+        }
+    }
 }
