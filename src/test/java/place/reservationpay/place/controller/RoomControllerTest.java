@@ -7,11 +7,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import place.reservationpay.fixtures.RoomFixtures;
 import place.reservationpay.place.constant.RoomStatus;
+import place.reservationpay.place.domain.Room;
 import place.reservationpay.place.dto.AddRoomRequest;
 import place.reservationpay.place.dto.EditRoomRequest;
 import place.reservationpay.place.dto.RoomDto;
@@ -19,6 +22,8 @@ import place.reservationpay.place.service.RoomService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -34,6 +39,74 @@ class RoomControllerTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
+
+    @Nested
+    @DisplayName("[룸 조회][GET] /api/rooms")
+    class GetRooms {
+        @Test
+        @DisplayName("룸 목록 조회 성공시 200 OK")
+        public void givenSuccessWhenGetRoomsThenResponse200OK() throws Exception {
+            // given
+            PageRequest pageable = PageRequest.of(0, 10);
+            RoomDto room = RoomFixtures.createRoomDto();
+            PageImpl<RoomDto> response = new PageImpl<>(List.of(room));
+            given(roomService.getRooms(any())).willReturn(response);
+            // when && then
+            mockMvc.perform(
+                    get("/api/rooms")
+                            .param("page", "0")
+                            .param("size", "10")
+            )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isOk(),
+                            jsonPath("$.data.content.size()").value(1),
+                            jsonPath("$.message").value("조회에 성공하였습니다.")
+                    );
+            verify(roomService).getRooms(pageable);
+        }
+    }
+
+    @Nested
+    @DisplayName("[룸 조회][GET] /api/room")
+    class GetRoom {
+        @Test
+        @DisplayName("룸 상세정보 조회 성공시 200 OK")
+        public void givenSuccessWhenGetRoomThenResponse200OK() throws Exception {
+            // given
+            RoomDto room = RoomFixtures.createRoomDto();
+            given(roomService.getRoom(any())).willReturn(room);
+            // when && then
+            mockMvc.perform(
+                    get("/api/room/{id}",1L)
+            )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isOk(),
+                            jsonPath("$.data.roomName").value("1번 스터디룸"),
+                            jsonPath("$.message").value("조회에 성공하였습니다.")
+                    );
+            verify(roomService).getRoom(1L);
+        }
+
+        @Test
+        @DisplayName("룸 상세정보 조회 실패시 400 BadRequest")
+        public void givenNotExistRoomWhenGetRoomThenResponse400BadRequest() throws Exception {
+            // given
+            RoomDto room = RoomFixtures.createRoomDto();
+            given(roomService.getRoom(any())).willThrow(new IllegalArgumentException("룸 정보가 존재하지 않습니다."));
+            // when && then
+            mockMvc.perform(
+                            get("/api/room/{id}",1L)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest(),
+                            jsonPath("$.message").value("룸 정보가 존재하지 않습니다.")
+                    );
+            verify(roomService).getRoom(1L);
+        }
+    }
 
     @Nested
     @DisplayName("[룸정보 등록][POST] /api/room")

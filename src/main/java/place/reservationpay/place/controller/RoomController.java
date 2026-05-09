@@ -2,6 +2,8 @@ package place.reservationpay.place.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import place.reservationpay.common.dto.ApiResponse;
 import place.reservationpay.place.constant.RoomStatus;
@@ -16,6 +18,17 @@ import place.reservationpay.place.service.RoomService;
 public class RoomController {
     private final RoomService roomService;
 
+    @GetMapping("/rooms")
+    public ApiResponse<Page<RoomDto>> getAllRooms(Pageable pageable) {
+        Page<RoomDto> response = roomService.getRooms(pageable);
+        return ApiResponse.success(response,"조회에 성공하였습니다.");
+    }
+
+    @GetMapping("/room/{id}")
+    public ApiResponse<RoomDto> getRoom(@PathVariable Long id) {
+        RoomDto response = roomService.getRoom(id);
+        return ApiResponse.success(response,"조회에 성공하였습니다.");
+    }
 
     @PostMapping("/room")
     public ApiResponse<RoomDto> addRoom(@Valid @RequestBody AddRoomRequest request) throws Exception {
