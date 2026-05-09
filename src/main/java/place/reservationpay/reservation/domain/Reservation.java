@@ -49,6 +49,19 @@ public class Reservation {
         this.room = room;
     }
 
+    public Reservation(Long id, String resNum, LocalDateTime startTime, LocalDateTime endTime, ReservationStatus status, LocalDateTime expireTime, LocalDate createAt, Integer resCount, Member member, Room room) {
+        this.id = id;
+        this.resNum = resNum;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.status = status;
+        this.expireTime = expireTime;
+        this.createAt = createAt;
+        this.resCount = resCount;
+        this.member = member;
+        this.room = room;
+    }
+
     // 생성
     public static Reservation createReservation(
             String resNum, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime expireTime, Integer resCount, Member member, Room room
@@ -63,5 +76,11 @@ public class Reservation {
         }else{
             throw new IllegalStateException("이미 처리된 예약은 수정이 불가능합니다.");
         }
+    }
+
+    public static Reservation createReservationForTest(
+            Long id, String resNum, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime expireTime, Integer resCount, Member member, Room room
+    ){
+        return new Reservation(id,resNum,startTime,endTime,ReservationStatus.PENDING,expireTime,LocalDate.now(),resCount,member,room);
     }
 }

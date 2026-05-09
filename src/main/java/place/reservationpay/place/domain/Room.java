@@ -40,6 +40,18 @@ public class Room {
         this.createAt = createAt;
     }
 
+    public Room(Long id, String roomName, Integer capacity, Integer pricePerHour, RoomStatus status, LocalTime startTime, LocalTime endTime, String description, LocalDate createAt) {
+        this.id = id;
+        this.roomName = roomName;
+        this.capacity = capacity;
+        this.pricePerHour = pricePerHour;
+        this.status = status;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.description = description;
+        this.createAt = createAt;
+    }
+
     public static Room createRoom(
             String roomName, Integer capacity, Integer pricePerHour, LocalTime startTime, LocalTime endTime, String description
     ){
@@ -59,5 +71,13 @@ public class Room {
 
     public void changeStatus(RoomStatus status){
         this.status = status;
+    }
+
+    public static Room createRoomForTest(
+            Long id,String roomName, Integer capacity, Integer pricePerHour, LocalTime startTime, LocalTime endTime, String description
+    ){
+        if(capacity == null) capacity = 1;
+        if(pricePerHour == null) pricePerHour = 0;
+        return new Room(id,roomName,capacity,pricePerHour,RoomStatus.ACTIVE,startTime,endTime,description,LocalDate.now());
     }
 }

@@ -16,8 +16,8 @@ public class RoomFixtures {
         return new EditRoomRequest("1번 스터디룸", 4,10000, LocalTime.of(11,0),LocalTime.of(20,0),"");
     }
     public static Room createRoom(){
-        return Room.createRoom(
-                "1번 스터디룸", 4,10000, LocalTime.of(11,0),LocalTime.of(20,0),""
+        return Room.createRoomForTest(
+                1L,"1번 스터디룸", 4,10000, LocalTime.of(11,0),LocalTime.of(20,0),""
         );
     }
 
