@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import place.reservationpay.fixtures.RoomFixtures;
+import place.reservationpay.place.constant.RoomStatus;
 import place.reservationpay.place.dto.AddRoomRequest;
 import place.reservationpay.place.dto.EditRoomRequest;
 import place.reservationpay.place.dto.RoomDto;
@@ -158,5 +159,52 @@ class RoomControllerTest {
             verify(roomService).editRoom(1L,request);
         }
 
+    }
+    @Nested
+    @DisplayName("[룸상태 수정][PATCH] /api/room/{id}/change-status")
+    class ChangeStatus {
+
+        @Test
+        @DisplayName("룸상태 수정에 성공시 200 OK")
+        public void givenSuccessWhenChangeStatusThen200Ok() throws Exception {
+            // given
+            Long id = 1L;
+            RoomStatus roomStatus = RoomStatus.INACTIVE;
+            RoomDto roomDto = RoomFixtures.createRoomDto();
+            given(roomService.changeStatus(any(),any())).willReturn(id);
+            // when
+            mockMvc.perform(
+                            patch("/api/room/{id}/change-status",id)
+                                    .param("roomStatus",roomStatus.toString())
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isOk(),
+                            jsonPath("$.data").value(1L),
+                            jsonPath("$.message").value("상태변경에 성공하였습니다.")
+                    );
+            // then
+            verify(roomService).changeStatus(id,roomStatus);
+        }
+        @Test
+        @DisplayName("수정할 룸정보가 존재하지 않을시 400 BadRequest")
+        public void givenNotEditRoomWhenChangeStatusThen400BadRequest() throws Exception {
+            // given
+            Long id = 1L;
+            RoomStatus roomStatus = RoomStatus.INACTIVE;
+            given(roomService.changeStatus(any(),any())).willThrow(new IllegalArgumentException("등록된 룸 정보가 존재하지 않습니다."));
+            // when
+            mockMvc.perform(
+                            patch("/api/room/{id}/change-status",id)
+                                    .param("roomStatus",roomStatus.toString())
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest(),
+                            jsonPath("$.message").value("등록된 룸 정보가 존재하지 않습니다.")
+                    );
+            // then
+            verify(roomService).changeStatus(id,roomStatus);
+        }
     }
 }
