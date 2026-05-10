@@ -14,6 +14,7 @@ import place.reservationpay.member.domain.Member;
 import place.reservationpay.member.repository.MemberRepository;
 import place.reservationpay.place.domain.Room;
 import place.reservationpay.place.repository.RoomRepository;
+import place.reservationpay.reservation.constant.ReservationStatus;
 import place.reservationpay.reservation.domain.Reservation;
 import place.reservationpay.reservation.dto.AddReservationRequest;
 import place.reservationpay.reservation.dto.ReservationDto;
@@ -58,7 +59,7 @@ class ReservationServiceTest {
 
         @Test
         @DisplayName("회원정보가 존재하지 않을시 IllegalArgumentException Throw")
-        public void givenNotMemberWhenAddReservationThenReturnReservationDto() throws Exception {
+        public void givenNotMemberWhenAddReservationThenIllegalArgumentExceptionThrow() throws Exception {
             // given
             AddReservationRequest request = ReservationFixtures.createAddReservationRequest();
             given(reservationRepository.countByCreateAt(any())).willReturn(1L);
@@ -71,7 +72,7 @@ class ReservationServiceTest {
 
         @Test
         @DisplayName("룸 정보가 존재하지 않을시 IllegalArgumentException Throw")
-        public void givenNotRoomWhenAddReservationThenReturnReservationDto() throws Exception {
+        public void givenNotRoomWhenAddReservationThenIllegalArgumentExceptionThrow() throws Exception {
             // given
             AddReservationRequest request = ReservationFixtures.createAddReservationRequest();
             Member member = MemberFixtures.createMember();
@@ -83,5 +84,35 @@ class ReservationServiceTest {
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("예약 대상이 존재하지않습니다.");
         }
+    }
+    @Nested
+    @DisplayName("[예약상태 수정]")
+    class ChangeReservationStatus {
+
+        @Test
+        @DisplayName("예약생성 성공시 Id 반환")
+        public void givenSuccessWhenChangeReservationStatusThenReturnId() throws Exception {
+            // given
+            Member member = MemberFixtures.createMember();
+            Room room = RoomFixtures.createRoom();
+            Reservation reservation = ReservationFixtures.createReservation(member, room);
+            given(reservationRepository.findById(any())).willReturn(Optional.of(reservation));
+            // when
+            Long result = sut.changeStatus(1L, ReservationStatus.COMPLETED);
+            // then
+            assertThat(result).isEqualTo(1L);
+        }
+
+        @Test
+        @DisplayName("예약 정보가 존재하지 않을시 IllegalArgumentException Throw")
+        public void givenNotReservationWhenChangeReservationStatusThenIllegalArgumentExceptionThrow() throws Exception {
+            // given
+            given(reservationRepository.findById(any())).willReturn(Optional.empty());
+            // when && then
+            assertThatThrownBy(() -> sut.changeStatus(1L, ReservationStatus.COMPLETED))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("예약정보가 존재하지 않습니다.");
+        }
+
     }
 }

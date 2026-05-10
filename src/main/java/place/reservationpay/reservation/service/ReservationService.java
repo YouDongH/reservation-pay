@@ -1,12 +1,16 @@
 package place.reservationpay.reservation.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import place.reservationpay.member.domain.Member;
 import place.reservationpay.member.repository.MemberRepository;
 import place.reservationpay.place.domain.Room;
 import place.reservationpay.place.repository.RoomRepository;
+import place.reservationpay.reservation.constant.ReservationStatus;
 import place.reservationpay.reservation.domain.Reservation;
 import place.reservationpay.reservation.dto.AddReservationRequest;
 import place.reservationpay.reservation.dto.ReservationDto;
@@ -24,7 +28,6 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
 
-    // 예약 조회
 
     // 예약 등록
     public ReservationDto addReservation(AddReservationRequest request) {
@@ -41,6 +44,13 @@ public class ReservationService {
         return ReservationDto.from(result);
     }
 
+    // 예약상태 변경
+    public Long changeStatus(Long id, ReservationStatus status) {
+        Reservation prev = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("예약정보가 존재하지 않습니다."));
+        prev.changeStatus(status);
+        return prev.getId();
+    }
 
     private String createResNum() {
         LocalDate now = LocalDate.now();
