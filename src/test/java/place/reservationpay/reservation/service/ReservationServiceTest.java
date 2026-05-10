@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import place.reservationpay.fixtures.MemberFixtures;
 import place.reservationpay.fixtures.ReservationFixtures;
 import place.reservationpay.fixtures.RoomFixtures;
@@ -20,6 +22,7 @@ import place.reservationpay.reservation.dto.AddReservationRequest;
 import place.reservationpay.reservation.dto.ReservationDto;
 import place.reservationpay.reservation.repository.ReservationRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -36,6 +39,36 @@ class ReservationServiceTest {
     @Mock private MemberRepository memberRepository;
     @Mock private RoomRepository roomRepository;
 
+    @Nested
+    @DisplayName("[예약 상세 조회]")
+    class GetReservations{
+        @Test
+        @DisplayName("예약정보 조회 성공시 ReservationDto 반환")
+        public void givenSuccessWhenGetReservationsThenReturnReservationDto() throws Exception {
+            // given
+            Member member = MemberFixtures.createMember();
+            Room room = RoomFixtures.createRoom();
+            Reservation reservation = ReservationFixtures.createReservation(member, room);
+            PageRequest pageable = PageRequest.of(0, 10);
+            given(memberRepository.findById(any())).willReturn(Optional.of(member));
+            given(reservationRepository.findByEmployee(any())).willReturn(List.of(reservation));
+            // when
+            Page<ReservationDto> results = sut.getReservations(1L, pageable);
+            // then
+            assertThat(results.getSize()).isEqualTo(1);
+        }
+        @Test
+        @DisplayName("예약정보가 존재하지 않을시 IllegalArgumentException Throw")
+        public void givenNotReservationWhenGetReservationsThenIllegalArgumentExceptionThrow() throws Exception {
+            // given
+            PageRequest pageable = PageRequest.of(0, 10);
+            given(memberRepository.findById(any())).willReturn(Optional.empty());
+            // when && then
+            assertThatThrownBy(() -> sut.getReservations(1L,pageable))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("예약을 진행한 회원이 존재하지않습니다.");
+        }
+    }
 
     @Nested
     @DisplayName("[예약 상세조회]")

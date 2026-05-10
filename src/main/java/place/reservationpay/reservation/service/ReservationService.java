@@ -1,6 +1,9 @@
 package place.reservationpay.reservation.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import place.reservationpay.member.domain.Member;
@@ -16,6 +19,7 @@ import place.reservationpay.reservation.repository.ReservationRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -25,6 +29,13 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
 
+    // 예약 조회
+    public Page<ReservationDto> getReservations(Long employeeId, Pageable pageable) {
+        Member member = memberRepository.findById(employeeId)
+                .orElseThrow(() -> new IllegalArgumentException("예약을 진행한 회원이 존재하지않습니다."));
+        List<Reservation> result = reservationRepository.findByEmployee(member);
+        return new PageImpl<>(result.stream().map(ReservationDto::from).toList());
+    }
     // 예약 상세조회
     public ReservationDto getReservation(Long id) {
         Reservation reservation = reservationRepository.findById(id)
