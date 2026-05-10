@@ -5,6 +5,7 @@ import place.reservationpay.place.domain.Room;
 import place.reservationpay.reservation.constant.ReservationStatus;
 import place.reservationpay.reservation.domain.Reservation;
 import place.reservationpay.reservation.dto.AddReservationRequest;
+import place.reservationpay.reservation.dto.ReservationDto;
 
 import java.time.LocalDateTime;
 
@@ -38,5 +39,19 @@ public class ReservationFixtures {
         return new AddReservationRequest(
                 LocalDateTime.of(2025, 1, 25, 11, 0), 2, 4, 1L,1L
         );
+    }
+    public static AddReservationRequest createAddReservationRequest(LocalDateTime startTime, Integer hours, Integer resCount, Long memberId, Long roomId) {
+        return new AddReservationRequest(startTime,hours,resCount,memberId,roomId);
+    }
+
+    public static ReservationDto createReservationDto(Member member, Room room) {
+        Reservation reservation = Reservation.createReservationForTest(
+                1L,
+                "20251111",
+                LocalDateTime.of(2025, 1, 25, 11, 0),
+                LocalDateTime.of(2025, 1, 25, 13, 0),
+                LocalDateTime.of(2025, 1, 26, 23, 59),
+                4, member, room);
+        return ReservationDto.from(reservation);
     }
 }
