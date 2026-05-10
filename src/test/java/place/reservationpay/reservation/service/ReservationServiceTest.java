@@ -36,6 +36,35 @@ class ReservationServiceTest {
     @Mock private MemberRepository memberRepository;
     @Mock private RoomRepository roomRepository;
 
+
+    @Nested
+    @DisplayName("[예약 상세조회]")
+    class GetReservation {
+        @Test
+        @DisplayName("예약생성 성공시 ReservationDto 반환")
+        public void givenSuccessWhenGetReservationThenReturnReservationDto() throws Exception {
+            // given
+            Member member = MemberFixtures.createMember();
+            Room room = RoomFixtures.createRoom();
+            Reservation reservation = ReservationFixtures.createReservation(member, room);
+            given(reservationRepository.findById(any())).willReturn(Optional.of(reservation));
+            // when
+            ReservationDto result = sut.getReservation(1L);
+            // then
+            assertThat(result.resNum()).isEqualTo(reservation.getResNum());
+        }
+        @Test
+        @DisplayName("예약정보가 존재하지 않을시 IllegalArgumentException Throw")
+        public void givenNotReservationWhenGetReservationThenIllegalArgumentExceptionThrow() throws Exception {
+            // given
+            given(reservationRepository.findById(any())).willReturn(Optional.empty());
+            // when && then
+            assertThatThrownBy(() -> sut.getReservation(1L))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("예약정보가 존재하지않습니다.");
+        }
+    }
+
     @Nested
     @DisplayName("[예약등록]")
     class AddReservation {

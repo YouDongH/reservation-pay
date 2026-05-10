@@ -1,9 +1,6 @@
 package place.reservationpay.reservation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import place.reservationpay.member.domain.Member;
@@ -28,6 +25,12 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
 
+    // 예약 상세조회
+    public ReservationDto getReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("예약정보가 존재하지않습니다."));
+        return ReservationDto.from(reservation);
+    }
 
     // 예약 등록
     public ReservationDto addReservation(AddReservationRequest request) {
