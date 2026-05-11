@@ -7,6 +7,7 @@ import place.reservationpay.member.constant.Gender;
 public record AddMemberRequest(
         @NotEmpty String loginId,
         @NotEmpty String pw,
+        @NotEmpty String name,
         @NotEmpty String birthday,
         @NotNull Gender gender,
         @NotEmpty String email,

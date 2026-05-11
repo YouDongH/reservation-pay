@@ -21,7 +21,7 @@ public class MemberService {
     @Transactional
     public MemberDto addMember(AddMemberRequest request) {
         String pw = passwordEncoder.encode(request.pw());
-        Member member = Member.createMember(request.loginId(), pw, request.birthday(), request.gender(), request.email(), request.mobile());
+        Member member = Member.createMember(request.loginId(), pw, request.name(), request.birthday(), request.gender(), request.email(), request.mobile());
         Member result = memberRepository.save(member);
         System.out.println("result = " + result);
         return MemberDto.from(result);

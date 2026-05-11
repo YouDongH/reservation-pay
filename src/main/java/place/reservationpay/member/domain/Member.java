@@ -22,6 +22,8 @@ public class Member {
     @Column(nullable = false)
     private String pw;
     @Column(nullable = false)
+    private String name;
+    @Column(nullable = false)
     private String birthday;
     @Column(nullable = false)
     private Gender gender;
@@ -34,9 +36,11 @@ public class Member {
     @Column(nullable = false, updatable = false)
     private LocalDate createAt;
 
-    public Member(String loginId, String pw, String birthday, Gender gender, String email, String mobile, String grade, LocalDate createAt) {
+    public Member(Long id, String loginId, String pw, String name, String birthday, Gender gender, String email, String mobile, String grade, LocalDate createAt) {
+        this.id = id;
         this.loginId = loginId;
         this.pw = pw;
+        this.name = name;
         this.birthday = birthday;
         this.gender = gender;
         this.email = email;
@@ -45,10 +49,10 @@ public class Member {
         this.createAt = createAt;
     }
 
-    public Member(Long id, String loginId, String pw, String birthday, Gender gender, String email, String mobile, String grade, LocalDate createAt) {
-        this.id = id;
+    public Member(String loginId, String pw, String name, String birthday, Gender gender, String email, String mobile, String grade, LocalDate createAt) {
         this.loginId = loginId;
         this.pw = pw;
+        this.name = name;
         this.birthday = birthday;
         this.gender = gender;
         this.email = email;
@@ -59,10 +63,10 @@ public class Member {
 
     // 직원 생성메소드
     public static Member createMember(
-            String loginId, String pw, String birthday, Gender gender, String email, String mobile
+            String loginId, String pw, String name, String birthday, Gender gender, String email, String mobile
     ){
         return new Member(
-                loginId,pw,birthday,gender,email,mobile,"일반회원",LocalDate.now()
+                loginId,pw,name,birthday,gender,email,mobile,"일반회원",LocalDate.now()
         );
     }
     // 직원 수정 메소드
@@ -76,10 +80,10 @@ public class Member {
     }
     // 직원 생성메소드
     public static Member createMemberForTest(
-            Long id, String loginId, String pw, String birthday, Gender gender, String email, String mobile
+            Long id, String loginId, String pw, String name, String birthday, Gender gender, String email, String mobile
     ){
         return new Member(
-                id, loginId,pw,birthday,gender,email,mobile,"일반회원",LocalDate.now()
+                id, loginId,pw, name, birthday,gender,email,mobile,"일반회원",LocalDate.now()
         );
     }
 }

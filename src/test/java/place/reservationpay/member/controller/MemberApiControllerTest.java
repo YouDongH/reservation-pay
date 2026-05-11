@@ -57,19 +57,20 @@ class MemberApiControllerTest {
 
         @ParameterizedTest
         @CsvSource(value = {
-                "loginId is null,nl,nl,nl,nl,nl,nl",
-                "pw is null,nl,nl,nl,nl,nl,nl",
-                "birthday is null,nl,nl,nl,nl,nl,nl",
-                "gender is null,nl,nl,nl,nl,nl,nl",
-                "email is null,nl,nl,nl,nl,nl,nl",
-                "mobile is null,nl,nl,nl,nl,nl,nl"
+                "loginId is null,nl,1234,홍길동,2002-01-25,WOMAN,email@naver.com,010-9999-8888",
+                "pw is null,test01,nl,홍길동,2002-01-25,WOMAN,email@naver.com,010-9999-8888",
+                "name is null,test01,1234,nl,2002-01-25,WOMAN,email@naver.com,010-9999-8888",
+                "birthday is null,test01,1234,홍길동,nl,WOMAN,email@naver.com,010-9999-8888",
+                "gender is null,test01,1234,홍길동,2002-01-25,nl,email@naver.com,010-9999-8888",
+                "email is null,test01,1234,홍길동,2002-01-25,WOMAN,nl,010-9999-8888",
+                "mobile is null,test01,1234,홍길동,2002-01-25,WOMAN,email@naver.com,nl"
         }, nullValues = "nl")
         @DisplayName("가입 정보 누락시 400 BadRequest")
         public void givenOmittedDataWhenAddMemberThen400BADREQUEST(
-                String name, String loginId, String pw, String birthday, Gender gender, String email, String mobile
+                String testName, String loginId, String pw, String name, String birthday, Gender gender, String email, String mobile
         ) throws Exception {
             // given
-            AddMemberRequest request = MemberFixtures.createAddMemberRequest(loginId, pw, birthday, gender, email, mobile);
+            AddMemberRequest request = MemberFixtures.createAddMemberRequest(loginId, pw, name, birthday, gender, email, mobile);
             String body = objectMapper.writeValueAsString(request);
             // when && then
             mockMvc.perform(

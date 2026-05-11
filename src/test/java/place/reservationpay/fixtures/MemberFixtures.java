@@ -9,13 +9,13 @@ import place.reservationpay.member.dto.request.EditMemberRequest;
 public class MemberFixtures {
     public static AddMemberRequest createAddMemberRequest() {
         return new AddMemberRequest(
-                "test01","1234","2002-01-25", Gender.WOMAN,"email@naver.com","010-9999-8888"
+                "test01","1234","홍길동", "2002-01-25", Gender.WOMAN,"email@naver.com","010-9999-8888"
         );
     }
     public static AddMemberRequest createAddMemberRequest(
-            String loginId, String pw, String birthday, Gender gender, String email, String mobile
+            String loginId, String pw, String name, String birthday, Gender gender, String email, String mobile
     ) {
-        return new AddMemberRequest(loginId,pw,birthday,gender,email,mobile);
+        return new AddMemberRequest(loginId,pw,name,birthday,gender,email,mobile);
     }
 
     public static EditMemberRequest createEditMemberRequest() {
@@ -28,10 +28,10 @@ public class MemberFixtures {
     }
 
     public static Member createMember() {
-        return Member.createMemberForTest(1L,"test01","1234","2002-01-25", Gender.WOMAN,"email@naver.com","010-9999-8888");
+        return Member.createMemberForTest(1L,"test01","1234","홍길동", "2002-01-25", Gender.WOMAN,"email@naver.com","010-9999-8888");
     }
     public static Member createMember(String pw) {
-        return Member.createMemberForTest(1L,"test01",pw,"2002-01-25", Gender.WOMAN,"email@naver.com","010-9999-8888");
+        return Member.createMemberForTest(1L,"test01",pw,"홍길동","2002-01-25", Gender.WOMAN,"email@naver.com","010-9999-8888");
     }
     public static MemberDto createMemberDto() {
         return new MemberDto("test01","1234","2002-01-25", Gender.WOMAN,"email@naver.com","010-9999-8888");

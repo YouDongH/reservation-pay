@@ -14,12 +14,13 @@ class MemberTest {
         // given
         String loginId = "loginId";
         String pw = "pw";
+        String name = "홍길동";
         String birthday = "2002-02-25";
         Gender gender = Gender.MAN;
         String email = "email@naver.com";
         String mobile = "010-6655-4433";
         // when
-        Member result = Member.createMember(loginId, pw, birthday, gender, email, mobile);
+        Member result = Member.createMember(loginId, pw, name, birthday, gender, email, mobile);
 
         // then
         assertThat(result.getGrade()).isEqualTo("일반회원");
