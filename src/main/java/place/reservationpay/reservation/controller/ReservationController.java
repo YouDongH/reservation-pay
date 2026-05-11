@@ -23,6 +23,12 @@ public class ReservationController {
         return ApiResponse.success(response,"조회에 성공하였습니다.");
     }
 
+    @GetMapping("/reservation/{id}")
+    public ApiResponse<ReservationDto> getReservation(@PathVariable Long id) {
+        ReservationDto response = reservationService.getReservation(id);
+        return ApiResponse.success(response,"조회에 성공하였습니다.");
+    }
+
     @PostMapping("/reservation")
     public ApiResponse<ReservationDto> addReservation(@Valid @RequestBody AddReservationRequest addReservationRequest) {
         ReservationDto response = reservationService.addReservation(addReservationRequest);

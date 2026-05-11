@@ -71,6 +71,49 @@ class ReservationControllerTest {
     }
 
     @Nested
+    @DisplayName("[예약정보 상세조회][GET] /api/reservation/{id}")
+    class GetReservation{
+        @Test
+        @DisplayName("예약정보 상세조회 성공시 200 OK")
+        public void givenSuccessWhenGetReservationThenResponse200OK() throws Exception {
+            // given
+            Member member = MemberFixtures.createMember();
+            Room room = RoomFixtures.createRoom();
+            ReservationDto reservationDto = ReservationFixtures.createReservationDto(member, room);
+            given(reservationService.getReservation(any())).willReturn(reservationDto);
+            // when
+            mockMvc.perform(
+                            get("/api/reservation/{id}",1L)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isOk(),
+                            jsonPath("$.message").value("조회에 성공하였습니다.")
+                    );
+            // then
+            verify(reservationService).getReservation(1L);
+        }
+        @Test
+        @DisplayName("예약 정보가 존재하지 않을 경우 성공시 400 BadRequest")
+        public void givenNotReservationWhenGetReservationThenResponse400BadRequest() throws Exception {
+            // given
+            given(reservationService.getReservation(any()))
+                    .willThrow(new IllegalArgumentException("예약정보가 존재하지 않습니다."));
+            // when
+            mockMvc.perform(
+                            get("/api/reservation/{id}",1L)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest(),
+                            jsonPath("$.message").value("예약정보가 존재하지 않습니다.")
+                    );
+            // then
+            verify(reservationService).getReservation(1L);
+        }
+    }
+
+    @Nested
     @DisplayName("[예약하기][POST] /api/reservation")
     class AddReservation {
         @Test
