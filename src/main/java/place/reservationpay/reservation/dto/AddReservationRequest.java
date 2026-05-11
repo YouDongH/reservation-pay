@@ -1,14 +1,14 @@
 package place.reservationpay.reservation.dto;
 
-import place.reservationpay.reservation.constant.ReservationStatus;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
 public record AddReservationRequest(
-        LocalDateTime startTime,
-        Integer hours,
-        Integer resCount,
-        Long memberId,
-        Long roomId
+        @NotNull LocalDateTime startTime,
+        @NotNull Integer hours,
+        @NotNull Integer resCount,
+        @NotNull Long memberId,
+        @NotNull Long roomId
 ) {
 }

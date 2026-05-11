@@ -15,6 +15,7 @@ import place.reservationpay.fixtures.ReservationFixtures;
 import place.reservationpay.fixtures.RoomFixtures;
 import place.reservationpay.member.domain.Member;
 import place.reservationpay.place.domain.Room;
+import place.reservationpay.reservation.constant.ReservationStatus;
 import place.reservationpay.reservation.dto.AddReservationRequest;
 import place.reservationpay.reservation.dto.ReservationDto;
 import place.reservationpay.reservation.service.ReservationService;
@@ -25,7 +26,7 @@ import java.time.LocalDateTime;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,7 +43,7 @@ class ReservationControllerTest {
     @DisplayName("[예약하기][POST] /api/reservation")
     class AddReservation {
         @Test
-        @DisplayName("예약 성공시 200응답")
+        @DisplayName("예약 성공시 200 OK")
         public void givenSuccessWhenAddReservationThenResponse200OK() throws Exception {
             // given
             AddReservationRequest request = ReservationFixtures.createAddReservationRequest();
@@ -60,7 +61,7 @@ class ReservationControllerTest {
                     .andDo(print())
                     .andExpectAll(
                             status().isOk(),
-                            jsonPath("$.message").value("조회에 성공하였습니다.")
+                            jsonPath("$.message").value("예약이 되었습니다.")
                     );
             // then
             verify(reservationService).addReservation(request);
@@ -137,4 +138,45 @@ class ReservationControllerTest {
             verify(reservationService).addReservation(request);
         }
     }
+
+    @Nested
+    @DisplayName("[예약취소][PATCH] /api/reservation/{id}/cancel")
+    class ChangeStatus{
+        @Test
+        @DisplayName("예약 취소 성공시 200 OK")
+        public void givenSuccessWhenChangeStatusThenResponse200OK() throws Exception {
+            // given
+            given(reservationService.changeStatus(any(),any())).willReturn(1L);
+            // when
+            mockMvc.perform(
+                            patch("/api/reservation/{id}/cancel",1L)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isOk(),
+                            jsonPath("$.message").value("예약이 취소되었습니다.")
+                    );
+            // then
+            verify(reservationService).changeStatus(1L, ReservationStatus.CANCELLED);
+        }
+        @Test
+        @DisplayName("예약 정보가 존재하지 않을 경우 성공시 400 BadRequest")
+        public void givenNotReservationWhenChangeStatusThenResponse400BadRequest() throws Exception {
+            // given
+            given(reservationService.changeStatus(any(),any()))
+                    .willThrow(new IllegalArgumentException("예약정보가 존재하지 않습니다."));
+            // when
+            mockMvc.perform(
+                            patch("/api/reservation/{id}/cancel",1L)
+                    )
+                    .andDo(print())
+                    .andExpectAll(
+                            status().isBadRequest(),
+                            jsonPath("$.message").value("예약정보가 존재하지 않습니다.")
+                    );
+            // then
+            verify(reservationService).changeStatus(1L, ReservationStatus.CANCELLED);
+        }
+    }
+
 }
