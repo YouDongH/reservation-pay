@@ -7,6 +7,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,6 +25,7 @@ import place.reservationpay.reservation.service.ReservationService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -38,6 +42,33 @@ class ReservationControllerTest {
     ReservationService reservationService;
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;
+
+    @Nested
+    @DisplayName("[예약정보 상세조회][GET] /api/reservations")
+    class GetReservations{
+        @Test
+        @DisplayName("예약목록 조회 성공시 200 OK")
+        public void givenSuccessWhenGetReservationsThenResponse200OK() throws Exception {
+            // given
+            Pageable pageable = PageRequest.of(0, 10);
+            Member member = MemberFixtures.createMember();
+            Room room = RoomFixtures.createRoom();
+            ReservationDto reservationDto = ReservationFixtures.createReservationDto(member, room);
+            PageImpl<ReservationDto> response = new PageImpl<>(List.of(reservationDto));
+            given(reservationService.getReservations(any(),any())).willReturn(response);
+            // when
+            mockMvc.perform(
+                    get("/api/reservations")
+                            .param("page","0")
+                            .param("size","10")
+                            .param("employeeId", String.valueOf(1L))
+            )
+                    .andDo(print())
+                    .andExpect(status().isOk());
+            // then
+            verify(reservationService).getReservations(1L,pageable);
+        }
+    }
 
     @Nested
     @DisplayName("[예약하기][POST] /api/reservation")

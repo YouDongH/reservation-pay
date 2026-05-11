@@ -17,6 +17,12 @@ import place.reservationpay.reservation.service.ReservationService;
 public class ReservationController {
     private final ReservationService reservationService;
 
+    @GetMapping("/reservations")
+    public ApiResponse< Page<ReservationDto>> getReservations(Long employeeId, Pageable pageable) {
+        Page<ReservationDto> response = reservationService.getReservations(employeeId, pageable);
+        return ApiResponse.success(response,"조회에 성공하였습니다.");
+    }
+
     @PostMapping("/reservation")
     public ApiResponse<ReservationDto> addReservation(@Valid @RequestBody AddReservationRequest addReservationRequest) {
         ReservationDto response = reservationService.addReservation(addReservationRequest);
