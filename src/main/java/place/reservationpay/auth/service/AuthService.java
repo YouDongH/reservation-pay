@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import place.reservationpay.auth.dto.FindIdRequest;
+import place.reservationpay.auth.dto.FindPwRequest;
 import place.reservationpay.auth.dto.LoginRequest;
 import place.reservationpay.auth.dto.LoginSessionDto;
 import place.reservationpay.common.exception.AuthException;
+import place.reservationpay.member.domain.Member;
 import place.reservationpay.member.repository.MemberRepository;
 import place.reservationpay.member.repository.query.LoginVo;
 
@@ -29,6 +32,14 @@ public class AuthService {
         return LoginSessionDto.of(result.id(),result.name());
     }
     // 아이디 찾기
-
+    public String findLoginId(FindIdRequest request){
+        String loginId = memberRepository.findByEmailAndName(request.email(), request.name())
+                .orElseThrow(() -> new IllegalArgumentException("일치하는 정보가 존재하지 않습니다."));
+        return loginId;
+    }
     // 비밀번호 찾기
+    public void findPw(FindPwRequest request){
+        if(!memberRepository.findPwCheck(request.email(), request.name(),request.loginId()))
+            throw new IllegalArgumentException("일치하는 정보가 존재하지 않습니다.");
+    }
 }
